@@ -5,7 +5,7 @@ const inquirer = require('inquirer').default; // Import inquirer for user input
 async function getUserInput() {
   try {
     // Prompt the user for RPC URL
-    const rpcUrl = await inquirer.prompt({
+    const { rpcUrl } = await inquirer.prompt({
       type: 'input',
       name: 'rpcUrl',
       message: 'Enter RPC URL:',
@@ -13,7 +13,7 @@ async function getUserInput() {
     });
 
     // Prompt the user for private key
-    const privateKey = await inquirer.prompt({
+    const { privateKey } = await inquirer.prompt({
       type: 'password',
       name: 'privateKey',
       message: 'Enter private key:',
@@ -21,7 +21,7 @@ async function getUserInput() {
     });
 
     // Prompt the user for number of transactions
-    const numTransactions = await inquirer.prompt({
+    const { numTransactions } = await inquirer.prompt({
       type: 'number',
       name: 'numTransactions',
       message: 'Enter number of transactions:',
@@ -29,30 +29,30 @@ async function getUserInput() {
     });
 
     // Prompt the user to add recipient addresses
-    const recipient1 = await inquirer.prompt({
-      type: 'input',
-      name: 'recipient1',
-      message: 'Enter recipient address 1:'
-    });
-
-    const recipient2 = await inquirer.prompt({
-      type: 'input',
-      name: 'recipient2',
-      message: 'Enter recipient address 2:'
-    });
-
-    const recipient3 = await inquirer.prompt({
-      type: 'input',
-      name: 'recipient3',
-      message: 'Enter recipient address 3:'
-    });
+    const { recipient1, recipient2, recipient3 } = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'recipient1',
+        message: 'Enter recipient address 1:'
+      },
+      {
+        type: 'input',
+        name: 'recipient2',
+        message: 'Enter recipient address 2:'
+      },
+      {
+        type: 'input',
+        name: 'recipient3',
+        message: 'Enter recipient address 3:'
+      }
+    ]);
 
     // Return the user input
     return {
-      rpcUrl: rpcUrl.rpcUrl,
-      privateKey: privateKey.privateKey,
-      numTransactions: numTransactions.numTransactions,
-      recipients: [recipient1.recipient1, recipient2.recipient2, recipient3.recipient3]
+      rpcUrl,
+      privateKey,
+      numTransactions,
+      recipients: [recipient1, recipient2, recipient3]
     };
   } catch (error) {
     console.error('Error getting user input:', error);
@@ -83,14 +83,14 @@ async function sendTransactions(rpcUrl, privateKey, numTransactions, recipients)
         });
 
         transactionCount++; // Increment transaction count
-        console.log(Transaction ${transactionCount}: Sent ${amounts[i % amounts.length]} TEA to ${recipient}. Tx Hash: ${tx.hash});
+        console.log(`Transaction ${transactionCount}: Sent ${amounts[i % amounts.length]} TEA to ${recipient}. Tx Hash: ${tx.hash}`);
 
         // Wait for the transaction to be mined at the specified interval
         await new Promise(resolve => setTimeout(resolve, intervals[i % intervals.length] * 1000));
 
         // Wait for the transaction to be mined
         await tx.wait();
-        console.log(Transaction ${transactionCount} confirmed.);
+        console.log(`Transaction ${transactionCount} confirmed.`);
       }
     }
 
